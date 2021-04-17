@@ -8,6 +8,20 @@ import Menu from './Menu';
 import About from './About';
 import Contact from './Contact';
 import { connect } from 'react-redux';
+import { actions } from 'react-redux-form';
+import { addComment, fetchDishes, fetchLeaders, fetchPromo, fetchComments } from '../redux/ActionCreators';
+
+// adds thunks from redux to the props
+const mapDispatchToProps = (dispatch) => ({
+    addComment: (dishId, rating, comment, author) => dispatch(addComment(dishId, rating, comment, author)),
+    fetchDishes: () => dispatch(fetchDishes()),
+    fetchLeaders: () => dispatch(fetchLeaders()),
+    fetchPromo: () => dispatch(fetchPromo()),
+    fetchComments: () => dispatch(fetchComments()),
+    resetFeedbackForm: () => dispatch(actions.reset('feedback'))
+})
+
+// maps redux state to props
 const mapStateToProps = (state) => {
     return {
         dishes: state.dishes,
@@ -17,19 +31,35 @@ const mapStateToProps = (state) => {
     }
 };
 
+// main class component
 class Main extends Component {
     constructor(props) {
         super(props);
     }
+
+    componentDidMount() {
+        this.props.fetchDishes();
+        this.props.fetchLeaders();
+        this.props.fetchPromo();
+        this.props.fetchComments();
+    }
+        
 
     render() {
 
         const HomePage = () => {
             return(
                 <Home
-                    dish={this.props.dishes.filter((dish) => dish.featured)[0]}
-                    promotion={this.props.promotions.filter((promo) => promo.featured)[0]}
-                    leader={this.props.leaders.filter((leader) => leader.featured)[0]}
+                    dish={this.props.dishes.dishes.filter((dish) => dish.featured)[0]}
+                    dishesLoading ={this.props.dishes.isLoading}
+                    dishesErrMsg={this.props.dishes.errMsg}
+                    promotion={this.props.promotions.promo.filter((promo) => promo.featured)[0]}
+                    promoLoading ={this.props.promotions.isLoading}
+                    promoErrMsg={this.props.promotions.errMsg}
+                    leader={this.props.leaders.leaders.filter((leader) => leader.featured)[0]}
+                    leadersLoading ={this.props.leaders.isLoading}
+                    leadersErrMsg={this.props.leaders.errMsg}
+
                 />
             );
         }
@@ -37,8 +67,13 @@ class Main extends Component {
         const DishWithId = ({match}) => {
             return(
                 <DishDetails
-                    dish={this.props.dishes.filter((dish) => dish.id === parseInt(match.params.dishId,10))[0]}
-                    comments={this.props.comments.filter((comment) => comment.dishId === parseInt(match.params.dishId,10))}
+                    dish={this.props.dishes.dishes.filter((dish) => dish.id === parseInt(match.params.dishId,10))[0]}
+                    isLoading ={this.props.dishes.isLoading}
+                    errMsg={this.props.dishes.errMsg}
+                    comments={this.props.comments.comments.filter((comment) => comment.dishId === parseInt(match.params.dishId,10))}
+                    commentsErrMsg={this.props.comments.errMsg}
+                    addComment={this.props.addComment}
+                    resetFeedbackForm={this.props.resetFeedbackForm}
                 />
             );
         }
@@ -60,4 +95,4 @@ class Main extends Component {
     }
 }
 
-export default    connect(mapStateToProps) (Main);
+export default   withRouter(connect(mapStateToProps, mapDispatchToProps) (Main));
