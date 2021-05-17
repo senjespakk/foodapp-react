@@ -20,7 +20,7 @@ function Header() {
                             <Nav navbar>
                                 <NavItem>
                                     <NavLink className="nav-link" to="/home" >
-                                        <span className="fa fa-home fa-lg">Home</span>
+                                        <span className="fa fa-home fa-lg">Homiie</span>
                                     </NavLink>
                                 </NavItem>
                                 <NavItem>
